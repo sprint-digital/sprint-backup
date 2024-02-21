@@ -14,12 +14,12 @@ class SprintBackupCommand extends Command
     {
         $this->info('Publishing backup commands...');
 
-        if (!file_exists(app_path('Console/Commands'))) {
+        if (! file_exists(app_path('Console/Commands'))) {
             mkdir(app_path('Console/Commands'), 0755, true);
         }
 
-        copy(__DIR__ . '/BackupRestore.php', app_path('Console/Commands/BackupRestore.php'));
-        copy(__DIR__ . '/BackupToSprint.php', app_path('Console/Commands/BackupToSprint.php'));
+        copy(__DIR__.'/BackupRestore.php', app_path('Console/Commands/BackupRestore.php'));
+        copy(__DIR__.'/BackupToSprint.php', app_path('Console/Commands/BackupToSprint.php'));
         $this->info('Backup commands files added to Commands folder');
 
         return self::SUCCESS;
