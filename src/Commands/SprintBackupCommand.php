@@ -22,6 +22,10 @@ class SprintBackupCommand extends Command
         copy(__DIR__.'/BackupToSprint.php', app_path('Console/Commands/BackupToSprint.php'));
         $this->info('Backup commands files added to Commands folder');
 
+        $this->info('Publishing backup config...');
+        copy(__DIR__ . '/../../config/backup.php', config_path('backup.php'));
+        $this->info('Backup config published');
+
         return self::SUCCESS;
     }
 }

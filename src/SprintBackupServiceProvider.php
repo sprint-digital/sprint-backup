@@ -16,8 +16,7 @@ class SprintBackupServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('backup')
-            ->hasConfigFile()
+            ->name('sprint-backup')
             ->hasCommand(SprintBackupCommand::class);
     }
 }

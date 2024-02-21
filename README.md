@@ -34,7 +34,6 @@ You can publish the config file with:
 
 ```bash
 php artisan backup:install
-php artisan vendor:publish --tag="sprint-backup-config"
 ```
 
 Backup database:
