@@ -63,6 +63,15 @@ Restore database:
 php artisan backup:restore
 ```
 
+
+## Production / Staging
+
+You might have to install mysql on your server. (ie. worker servers)
+
+```bash
+sudo apt-get install -y default-mysql-client
+```
+
 ## Testing
 
 ```bash

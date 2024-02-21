@@ -26,7 +26,7 @@ class BackupToSprint extends Command
      */
     public function handle()
     {
-        Artisan::call('cache:clear');
+        Artisan::call('config:cache');
         Artisan::call('backup:run --only-db');
     }
 }
