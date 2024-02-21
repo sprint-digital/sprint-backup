@@ -161,7 +161,7 @@ return [
          * The password to be used for archive encryption.
          * Set to `null` to disable encryption.
          */
-        'password' => env('BACKUP_ARCHIVE_PASSWORD') . now()->setHour(0)->setMinute(0)->setSecond(0)->setMicrosecond(0)->timestamp,
+        'password' => env('BACKUP_ARCHIVE_PASSWORD').now()->setHour(0)->setMinute(0)->setSecond(0)->setMicrosecond(0)->timestamp,
 
         /*
          * The encryption algorithm to be used for archive encryption.
