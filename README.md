@@ -27,7 +27,22 @@ BACKUP_AWS_USE_PATH_STYLE_ENDPOINT=false
 BACKUP_ARCHIVE_PASSWORD="{secret}"
 BACKUP_AWS_PATH="{project repository name}"
 BACKUP_MASTER_PASSWORD="{secret}"
+```
 
+Add the following to your `config/filesystems.php` in `disks` array:
+
+```php
+'s3-backup' => [
+    'driver' => 's3',
+    'key' => env('BACKUP_AWS_ACCESS_KEY_ID'),
+    'secret' => env('BACKUP_AWS_SECRET_ACCESS_KEY'),
+    'region' => env('BACKUP_AWS_DEFAULT_REGION'),
+    'bucket' => env('BACKUP_AWS_BUCKET'),
+    'url' => env('BACKUP_AWS_URL') . '/' . env('BACKUP_AWS_PATH'),
+    'endpoint' => env('BACKUP_AWS_ENDPOINT'),
+    'use_path_style_endpoint' => env('BACKUP_AWS_USE_PATH_STYLE_ENDPOINT', false),
+    'throw' => false,
+],
 ```
 
 You can publish the config file with:
