@@ -18,7 +18,7 @@
     "require": {
         "php": "^7.4",
         "laravel/framework": "^8.0||^9.0||^10.0",
-        "spatie/laravel-package-tools": "^1.14.0",
+        "spatie/laravel-package-tools": "^1.0||^1.14.0||^1.14.0",
         "illuminate/contracts": "^8.0||^9.0||^10.0",
         "spatie/laravel-backup": "^7.0"
     },
