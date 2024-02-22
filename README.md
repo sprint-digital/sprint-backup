@@ -7,6 +7,8 @@
 
 Back up and secure database to AWS S3. Then redistribute the backup to other team environments.
 
+DO NOT SKIP THIS STEP!!! please read AWS setup [HERE](https://sprintdigital.atlassian.net/l/cp/kr9F1uHP).
+
 
 ## Installation
 
