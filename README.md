@@ -1,4 +1,4 @@
-# Sprint backup
+# Sprint backup - LARAVEL v10 ONLY
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/sprint-digital/sprint-backup.svg?style=flat-square)](https://packagist.org/packages/sprint-digital/sprint-backup)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/sprint-digital/sprint-backup/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/sprint-digital/sprint-backup/actions?query=workflow%3Arun-tests+branch%3Amain)
@@ -26,9 +26,9 @@ BACKUP_AWS_SECRET_ACCESS_KEY=
 BACKUP_AWS_DEFAULT_REGION=ap-southeast-2
 BACKUP_AWS_BUCKET=sprint-db-bucket
 BACKUP_AWS_USE_PATH_STYLE_ENDPOINT=false
-BACKUP_ARCHIVE_PASSWORD="{secret}"
-BACKUP_AWS_PATH="{project repository name}"
-BACKUP_MASTER_PASSWORD="{secret}"
+BACKUP_ARCHIVE_PASSWORD="{zipSecret}"
+BACKUP_AWS_PATH="{repoName}"
+BACKUP_MASTER_PASSWORD="{userPassword}"
 ```
 
 Add the following to your `config/filesystems.php` in `disks` array:
@@ -63,6 +63,13 @@ Restore database:
 
 ```bash
 php artisan backup:restore
+```
+
+In some cases the .sql file is too large to be restored. In those cases, you should just manually restore the database and then run the following command to clean up the database:
+
+```bash
+# Use this in local docker/local environment
+cat storage/app/restore/content/db-dumps/mysql-homestead.sql | docker exec -i {CONTAINER_NAME} /usr/bin/mysql -u homestead --password=password homestead 
 ```
 
 
