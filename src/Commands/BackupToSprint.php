@@ -32,9 +32,11 @@ class BackupToSprint extends Command
             Artisan::call('backup:run --only-db');
         } catch (\Exception $e) {
             $this->error('Backup to Sprint failed.');
+
             return Command::FAILURE;
         }
         $this->info('Backup to Sprint ended.');
+
         return Command::SUCCESS;
     }
 }
