@@ -26,7 +26,15 @@ class BackupToSprint extends Command
      */
     public function handle()
     {
+        $this->info('Backup to Sprint started.');
         Artisan::call('config:cache');
-        Artisan::call('backup:run --only-db');
+        try {
+            Artisan::call('backup:run --only-db');
+        } catch (\Exception $e) {
+            $this->error('Backup to Sprint failed.');
+            return Command::FAILURE;
+        }
+        $this->info('Backup to Sprint ended.');
+        return Command::SUCCESS;
     }
 }

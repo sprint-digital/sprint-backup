@@ -1,4 +1,4 @@
-# Sprint backup
+# Sprint backup - LARAVEL v8 ONLY
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/sprint-digital/sprint-backup.svg?style=flat-square)](https://packagist.org/packages/sprint-digital/sprint-backup)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/sprint-digital/sprint-backup/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/sprint-digital/sprint-backup/actions?query=workflow%3Arun-tests+branch%3Amain)
@@ -63,6 +63,13 @@ Restore database:
 
 ```bash
 php artisan backup:restore
+```
+
+In some cases the .sql file is too large to be restored. In those cases, you should just manually restore the database and then run the following command to clean up the database:
+
+```bash
+// Use this in local docker/local environment
+cat storage/app/restore/content/db-dumps/mysql-homestead.sql | docker exec -i {CONTAINER_NAME} /usr/bin/mysql -u homestead --password=password homestead 
 ```
 
 
