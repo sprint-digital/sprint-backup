@@ -146,6 +146,7 @@ class BackupRestore extends Command
                     exec($command);
                     DB::statement('SET FOREIGN_KEY_CHECKS=1;');
                     $this->info('Database restored');
+                    Storage::disk('local')->deleteDirectory('restore');
                     $isRestored = true;
                 } catch (\Exception $e) {
                     $this->error('Database restore failed');
