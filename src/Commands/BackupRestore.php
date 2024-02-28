@@ -162,6 +162,10 @@ class BackupRestore extends Command
             return Command::FAILURE;
         }
 
+        if (!$isRestored) {
+            return Command::FAILURE;
+        }
+
         // Step 5: Clean up Database. ie. replace production data.
         try {
             DB::transaction(function () {
