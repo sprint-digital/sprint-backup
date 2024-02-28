@@ -29,7 +29,7 @@ class BackupRestore extends Command
      *
      * @var string
      */
-    protected $signature = 'backup:restore';
+    protected $signature = 'backup:restore {--last-backup}';
 
     /**
      * The console command description.
@@ -66,15 +66,20 @@ class BackupRestore extends Command
     {
         Artisan::call('config:cache');
         // Step 1: Show and select a backup file.
+        $isRestored = false;
         $backups = Storage::disk('s3-backup')->allFiles(config('backup.variables.BACKUP_AWS_PATH'));
         $this->info('The following backups are available:');
         $this->info('----------------------------------');
         foreach ($backups as $index => $backup) {
-            $this->info(Str::padLeft($index + 1, 3, '0').': '.$backup);
+            $this->info(Str::padLeft($index + 1, 3, '0') . ': ' . $backup);
         }
-        $backupNumber = $this->ask('Which backup do you want to restore?');
+        if ($this->option('last-backup')) {
+            $backupNumber = count($backups);
+        } else {
+            $backupNumber = $this->ask('Which backup do you want to restore?');
+        }
         $backupFile = $backups[$backupNumber - 1];
-        $this->info('Selected '.$backupFile);
+        $this->info('Selected ' . $backupFile);
 
         try {
             $date = substr(explode('/', str_replace('.zip', '', $backupFile), 2)[1], 0, 10);
@@ -87,12 +92,12 @@ class BackupRestore extends Command
 
         // Step 2: Download and extract the backup file.
         $contents = Storage::disk('s3-backup')->get($backupFile);
-        Storage::disk('local')->put('restore/'.$backupFile, $contents);
+        Storage::disk('local')->put('restore/' . $backupFile, $contents);
 
         $zip = new ZipArchive();
-        $res = $zip->open(storage_path('app/restore/'.$backupFile));
+        $res = $zip->open(storage_path('app/restore/' . $backupFile));
         if ($res === true) {
-            $zip->setPassword(config('backup.variables.BACKUP_ARCHIVE_PASSWORD').$timestamp);
+            $zip->setPassword(config('backup.variables.BACKUP_ARCHIVE_PASSWORD') . $timestamp);
             if (Storage::disk('local')->exists('restore')) {
                 $this->info('Deleting old restore folder');
                 Storage::disk('local')->deleteDirectory('restore');
@@ -111,7 +116,7 @@ class BackupRestore extends Command
             if (Storage::disk('local')->exists('restore/content/db-dumps')) {
                 $files = Storage::disk('local')->allFiles('restore/content/db-dumps');
                 $latestFile = $files[count($files) - 1];
-                $this->info('The latest database backup is '.$latestFile);
+                $this->info('The latest database backup is ' . $latestFile);
                 $this->info('Dropping all tables in the database');
 
                 // Step 3: Delete old database Tables.
@@ -120,7 +125,7 @@ class BackupRestore extends Command
                         $tables = DB::select('SHOW TABLES');
                         foreach ($tables as $table) {
                             $tableArray = get_object_vars($table);
-                            $tableName = $tableArray['Tables_in_'.config('backup.variables.DB_DATABASE')];
+                            $tableName = $tableArray['Tables_in_' . config('backup.variables.DB_DATABASE')];
                             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
                             $sql = "DROP TABLE`$tableName`;";
                             DB::statement($sql);
@@ -128,14 +133,20 @@ class BackupRestore extends Command
                         }
                     });
                 } catch (\Exception $e) {
+                    $this->error('Database drop failed');
+                    $this->error(substr($e->getMessage(), 0, 1000));
+
+                    return Command::FAILURE;
                 }
                 // Step 4: Restore the database.
                 try {
-                    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-                    $output = DB::unprepared(file_get_contents(storage_path('app/'.$latestFile)));
-                    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
                     $this->info('Restoring the database');
-                    $output == 1 ? $this->info('Database restored') : $this->error('Database restore failed');
+                    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+                    $command = 'cat storage/app/restore/content/db-dumps/mysql-homestead.sql | /usr/bin/mysql --host=' . config('database.connections.mysql.host') . ' -u ' . config('database.connections.mysql.username') . ' --password=' . config('database.connections.mysql.password') . ' ' . config('backup.variables.DB_DATABASE') . ' 2>&1';
+                    exec($command);
+                    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+                    $this->info('Database restored');
+                    $isRestored = true;
                 } catch (\Exception $e) {
                     $this->error('Database restore failed');
                     $this->error(substr($e->getMessage(), 0, 1000));
@@ -153,18 +164,22 @@ class BackupRestore extends Command
             return Command::FAILURE;
         }
 
+        if (!$isRestored) {
+            return Command::FAILURE;
+        }
         // Step 5: Clean up Database. ie. replace production data.
         try {
             DB::transaction(function () {
                 $tables = DB::select('SHOW TABLES');
                 foreach ($tables as $table) {
                     $tableArray = get_object_vars($table);
-                    $tableName = $tableArray['Tables_in_'.config('backup.variables.DB_DATABASE')];
-                    if (! in_array($tableName, $this->excludedTables)) {
+                    $tableName = $tableArray['Tables_in_' . config('backup.variables.DB_DATABASE')];
+                    if (!in_array($tableName, $this->excludedTables)) {
                         $this->cleanTable($tableName);
                     }
                 }
             });
+            $this->info('Database cleanup completed');
         } catch (\Exception $e) {
             $this->error('Database cleanup failed');
             $this->error(substr($e->getMessage(), 0, 1000));
@@ -192,7 +207,7 @@ class BackupRestore extends Command
                 continue;
             }
             if (Schema::hasColumn($tableName, $column)) {
-                $sql = "UPDATE `$tableName` SET $column = ".$this->randomSqlWord();
+                $sql = "UPDATE `$tableName` SET $column = " . $this->randomSqlWord();
                 DB::statement($sql);
             }
         }
