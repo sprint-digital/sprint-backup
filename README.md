@@ -63,15 +63,11 @@ Restore database:
 
 ```bash
 php artisan backup:restore
+# or auto run the last backup
+php artisan backup:restore --last-backup
 ```
 
-In some cases the .sql file is too large to be restored. In those cases, you should just manually restore the database and then run the following command to clean up the database:
-
-```bash
-# Use this in local docker/local environment
-cat storage/app/restore/content/db-dumps/mysql-homestead.sql | docker exec -i {CONTAINER_NAME} /usr/bin/mysql -u homestead --password=password homestead 
-```
-
+In some cases the .sql file is too large to be restored. You need to increase the memory limit in your php.ini file
 
 ## Production / Staging
 

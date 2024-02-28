@@ -29,7 +29,7 @@ class BackupRestore extends Command
      *
      * @var string
      */
-    protected $signature = 'backup:restore';
+    protected $signature = 'backup:restore {--last-backup}';
 
     /**
      * The console command description.
@@ -67,13 +67,18 @@ class BackupRestore extends Command
         Artisan::call('config:cache');
 
         // Step 1: Show and select a backup file.
+        $isRestored = false;
         $backups = Storage::disk('s3-backup')->allFiles(config('backup.variables.BACKUP_AWS_PATH'));
         $this->info('The following backups are available:');
         $this->info('----------------------------------');
         foreach ($backups as $index => $backup) {
             $this->info(Str::padLeft($index + 1, 3, '0') . ': ' . $backup);
         }
-        $backupNumber = $this->ask('Which backup do you want to restore?');
+        if ($this->option('last-backup')) {
+            $backupNumber = count($backups);
+        } else {
+            $backupNumber = $this->ask('Which backup do you want to restore?');
+        }
         $backupFile = $backups[$backupNumber - 1];
         $this->info('Selected ' . $backupFile);
 
@@ -132,11 +137,14 @@ class BackupRestore extends Command
                 }
                 // Step 4: Restore the database.
                 try {
-                    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-                    $output = DB::unprepared(file_get_contents(storage_path('app/' . $latestFile)));
-                    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
                     $this->info('Restoring the database');
-                    $output == 1 ? $this->info('Database restored') : $this->error('Database restore failed');
+                    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+                    $command = 'cat storage/app/restore/content/db-dumps/mysql-homestead.sql | /usr/bin/mysql --host=' . config('database.connections.mysql.host') . ' -u ' . config('database.connections.mysql.username') . ' --password=' . config('database.connections.mysql.password') . ' ' . config('backup.variables.DB_DATABASE') . ' 2>&1';
+                    exec($command);
+                    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+                    $this->info('Database restored');
+                    Storage::disk('local')->deleteDirectory('restore');
+                    $isRestored = true;
                 } catch (\Exception $e) {
                     $this->error('Database restore failed');
                     $this->error(substr($e->getMessage(), 0, 1000));
