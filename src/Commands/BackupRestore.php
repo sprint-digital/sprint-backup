@@ -66,6 +66,12 @@ class BackupRestore extends Command
     {
         Artisan::call('config:cache');
 
+        if (config('app.env') == 'production' || env('APP_ENV') == 'production') {
+            $this->error('This command is not allowed in production environment.');
+
+            return Command::FAILURE;
+        }
+
         // Step 1: Show and select a backup file.
         $isRestored = false;
         $backups = Storage::disk('s3-backup')->allFiles(config('backup.variables.BACKUP_AWS_PATH'));
