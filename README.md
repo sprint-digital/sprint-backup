@@ -1,4 +1,4 @@
-# Sprint backup - LARAVEL v10 ONLY
+# Sprint backup - LARAVEL v10+ ONLY
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/sprint-digital/sprint-backup.svg?style=flat-square)](https://packagist.org/packages/sprint-digital/sprint-backup)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/sprint-digital/sprint-backup/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/sprint-digital/sprint-backup/actions?query=workflow%3Arun-tests+branch%3Amain)
