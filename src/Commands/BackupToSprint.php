@@ -24,7 +24,7 @@ class BackupToSprint extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Backup to Sprint started.');
         Artisan::call('config:cache');
@@ -33,10 +33,10 @@ class BackupToSprint extends Command
         } catch (\Exception $e) {
             $this->error('Backup to Sprint failed.');
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
         $this->info('Backup to Sprint ended.');
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 }
