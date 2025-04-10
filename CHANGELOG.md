@@ -2,6 +2,10 @@
 
 All notable changes to `sprint-backup` will be documented in this file.
 
+## 12.0.1 - 2025-04-10
+
+Just laravel 12 upgrade
+
 ## v10.0.2 - 2024-02-28
 
 **Full Changelog**: https://github.com/sprint-digital/sprint-backup/compare/v10.0.1...v10.0.2
