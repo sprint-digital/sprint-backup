@@ -62,14 +62,14 @@ class BackupRestore extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         Artisan::call('config:cache');
 
         if (config('app.env') == 'production' || env('APP_ENV') == 'production') {
             $this->error('This command is not allowed in production environment.');
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         // Step 1: Show and select a backup file.
@@ -94,7 +94,7 @@ class BackupRestore extends Command
         } catch (\Exception $e) {
             $this->error('Fail to extract date.');
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         // Step 2: Download and extract the backup file.
@@ -117,7 +117,7 @@ class BackupRestore extends Command
             } else {
                 $this->error('Database backup extraction failed. Password may be incorrect.');
 
-                return Command::FAILURE;
+                return self::FAILURE;
             }
 
             if (Storage::disk('local')->exists('restore/content/db-dumps')) {
@@ -143,7 +143,7 @@ class BackupRestore extends Command
                     $this->error('Database drop failed');
                     $this->error(substr($e->getMessage(), 0, 1000));
 
-                    return Command::FAILURE;
+                    return self::FAILURE;
                 }
                 // Step 4: Restore the database.
                 try {
@@ -159,21 +159,21 @@ class BackupRestore extends Command
                     $this->error('Database restore failed');
                     $this->error(substr($e->getMessage(), 0, 1000));
 
-                    return Command::FAILURE;
+                    return self::FAILURE;
                 }
             } else {
                 $this->error('Database backup not found');
 
-                return Command::FAILURE;
+                return self::FAILURE;
             }
         } else {
             $this->error('Database backup extraction failed');
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         if (!$isRestored) {
-            return Command::FAILURE;
+            return self::FAILURE;
         }
         // Step 5: Clean up Database. ie. replace production data.
         try {
@@ -192,10 +192,10 @@ class BackupRestore extends Command
             $this->error('Database cleanup failed');
             $this->error(substr($e->getMessage(), 0, 1000));
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     /**
